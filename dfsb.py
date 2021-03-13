@@ -48,8 +48,9 @@ class CSP:
         neighbors = []
         for constraint in self.constraints:
             if (node.key in constraint):
-                neighbor = constraint[constraint.index(node.key)-1]
-                neighbors.append(neighbor)
+                neighbor_key = constraint[constraint.index(node.key)-1]
+                neighbor_node = self.get_node(neighbor_key)
+                neighbors.append(neighbor_node)
         return neighbors
 
 def is_complete(assignment, csp): # assignment is the path taken
@@ -97,7 +98,7 @@ def plain_order_domain_values(var, assignment, csp):
 def plain_consistent(var, value, assignment, csp): # adjacent nodes cannot have the same color - check is consistent with the current assignments
     neighbors = csp.get_neighbors(var)
     for neighbor in neighbors:
-        if ((neighbor in assignment) and assignment[neighbor] == value):
+        if ((neighbor.key in assignment) and assignment[neighbor.key] == value):
             return False
     return True
 
@@ -179,11 +180,10 @@ def improved_order_domain_values(var, assignment, csp):
         counter = 0 # amount of choices
         neighbors = csp.get_neighbors(var)
         for neighbor in neighbors:
-            neighbor_node = csp.get_node(neighbor)
-            if (value in neighbor_node.domain):
-                counter += (len(neighbor_node.domain)-1)
+            if (value in neighbor.domain):
+                counter += (len(neighbor.domain)-1)
             else:
-                counter += len(neighbor_node.domain)
+                counter += len(neighbor.domain)
         values_remain[value] = counter
     ordered_domains = sorted(values_remain, key=values_remain.get)
     ordered_domains = ordered_domains[::-1] # greatest amount of choices to least
