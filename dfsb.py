@@ -6,12 +6,16 @@ import sys
 # Lecture slides
 # http://pages.cs.wisc.edu/~bgibson/cs540/handouts/csp.pdf
 # https://en.wikipedia.org/wiki/Min-conflicts_algorithm
+# https://www.ics.uci.edu/~welling/teaching/271fall09/CSP271fall09.pdf
 # http://aimacode.github.io/aima-java/aima3e/javadoc/aima-core/aima/core/search/csp/BacktrackingStrategy.html
+# https://en.wikipedia.org/wiki/Min-conflicts_algorithm
 # -------------------------------------------------------
+
 class Node: 
     def __init__(self, key, domain):
         self.key = key
         self.domain = domain # set domains, one for each variable
+        # domain is it's legal values
 
 class CSP:
     def __init__(self, n, m, k, constraints):
@@ -30,6 +34,12 @@ class CSP:
             node = Node(str(key), domain)
             variables.append(node)
         return variables
+
+    def get_node(self, key):
+        for node in self.variables:
+            if (node.key == key):
+                return node
+        return False
 
 def is_complete(assignment, csp): # assignment is the path taken
     if (len(assignment) != csp.n):
@@ -153,20 +163,36 @@ def improved_order_domain_values(var, assignment, csp):
     # least constraining value, use LCV
     # the one that rules out the fewest values in the remaining variables
     # try to pick values best first
-    
+    ordered_domains = []
+    values_remain = {}
     # assume the value for the variable and 
     # use the constraint graph to check how many values remain for the other variables
-    for value in csp.values:
-        print("v", value)
-        for variable in csp.variables:
-            print(variable)
-            print(csp.constraints)
-    print()
+    print("var", var.key)
+    for value in var.domain: # possible values for var
+        counter = 0 # amount of choices
+        print("---color", value)
+        for constraint in csp.constraints:
+            print("con", constraint)
+            if (var.key in constraint):
+                neighbor = constraint[constraint.index(var.key)-1]
+                print("n", neighbor)
+                neighbor_node = csp.get_node(neighbor)
+                if (value in neighbor_node.domain):
+                    counter += (len(neighbor_node.domain)-1)
+                else:
+                    counter += len(neighbor_node.domain)
+        values_remain[value] = counter
+    print(values_remain)
+    print("go over this later")
+    ordered_domains = sorted(values_remain, key=values_remain.get)
+    ordered_domains = ordered_domains[::-1] # greatest amount of choices to least
+    return ordered_domains
 
 def improved_consistent(var, value, assignment, csp):
     # use AC3
     # use forward checking
-    print()
+    print("incompelte")
+    return plain_consistent(var, value, assignment, csp)
 
 def improved_backtracking_search(csp):
     return improved_recursive_backtracking({}, csp)
@@ -175,8 +201,6 @@ def improved_recursive_backtracking(assignment, csp):
     if (is_complete(assignment, csp)): # if assignment is complete, return assignment (like goal test)
         return assignment
     var = improved_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
-    # improved_order_domain_values(var, assignment, csp)
-    '''
     for value in improved_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
         if improved_consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
             assignment[var] = value # add {var = value} to assignment
@@ -184,7 +208,6 @@ def improved_recursive_backtracking(assignment, csp):
             if (result): # if result not equal failure then return result
                 return result
             assignment.pop(var, None) # remove {var = value} from assignment
-    '''
     return False
 
 # -------------------------------------------------------
