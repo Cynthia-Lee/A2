@@ -192,7 +192,7 @@ def improved_consistent(var, value, assignment, csp):
     # use AC3
     # use forward checking
     print("incomplete")
-    return plain_consistent(var, value, assignment, csp)
+    return (plain_consistent(var, value, assignment, csp))
 
 def improved_backtracking_search(csp):
     return improved_recursive_backtracking({}, csp)
@@ -202,14 +202,12 @@ def improved_recursive_backtracking(assignment, csp):
         return assignment
     var = improved_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
     for value in improved_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
-        '''
         if improved_consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
-            assignment[var] = value # add {var = value} to assignment
+            assignment[var.key] = value # add {var = value} to assignment
             result = improved_recursive_backtracking(assignment, csp)
             if (result): # if result not equal failure then return result
                 return result
-            assignment.pop(var, None) # remove {var = value} from assignment
-        '''
+            assignment.pop(var.key, None) # remove {var = value} from assignment
     return False
 
 # -------------------------------------------------------
