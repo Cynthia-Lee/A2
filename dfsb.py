@@ -8,12 +8,12 @@ import sys
 # -------------------------------------------------------
 
 class CSP:
-    def __init__(self, n, m, k, graph):
+    def __init__(self, n, m, k, constraints):
         self.n = int(n) # n variables
         self.m = int(m) # m constraints
         self.k = int(k) # k possible colors
-        self.graph = graph # constraints
-        self.variables = self.set_variables()
+        self.constraints = constraints
+        self.variables = self.set_variables() # unassigned variables
     
     def set_variables(self):
         variables = []
@@ -38,31 +38,38 @@ def input_to_csp(file):
     n = first[0]
     m = first[1]
     k = first[2]
-    graph = {} # adjacency list
+    constraints = []
     for line in f:
         line = line.strip('\n')
-        constraint = line.split()
-        if (constraint[0] not in graph):
-            graph[constraint[0]] = []
-        graph[constraint[0]].append(constraint[1])
-    csp = CSP(n, m, k, graph)
-    print(graph)
+        c = line.split()
+        constraints.append((c[0], c[1]))
+    csp = CSP(n, m, k, constraints)
+    print("constraints", constraints)
     return csp
 
 def plain_select_unassigned_variable(variables, assignment, csp):
     # variables is unassigned items
-    if (not assignment):
-        print(variables)
-        # return variables[0]
-    # unassigned = []
-    # for var in variables:
-    #     if (var not in assignment):
-    #         unassigned.append(var)
-    # selected = unassigned[0]
-    return False
+    # This default implementation just selects the first in the ordered list of variables provided by the CSP.
+    var = variables[0]
+    csp.variables.remove(var)
+    return var
 
 def plain_order_domain_values(var, assignment, csp):
-    return False
+    # Primitive operation, ordering the domain values of the specified variable. 
+    # This default implementation just takes the default order provided by the CSP.
+    domain_values = []
+    for k in range(csp.k):
+        domain_values.append(k)
+    return domain_values
+
+def consistent(var, value, assignment, csp):
+    for constraint in csp.constraints:
+        if (var in constraint):
+            neighbor = constraint[constraint.index(var)-1]
+            # check that adjacent node does not have the same color
+            if ((neighbor in assignment) and assignment[neighbor] == value):
+                return False
+    return True
 
 def plain_backtracking_search(csp):
     # plain DFS, traverse the node tree depth first order
@@ -70,21 +77,21 @@ def plain_backtracking_search(csp):
     return plain_recursive_backtracking({}, csp)
 
 def plain_recursive_backtracking(assignment, csp): # returns solution or failure
-    # if assignment is complete, return assignment
-    if (is_complete(assignment, csp)): # like goal test
+    if (is_complete(assignment, csp)): # if assignment is complete, return assignment (like goal test)
         return assignment
-    # var <- select_unassigned_variable(variables[csp],assignment,csp)
-    var = plain_select_unassigned_variable(csp.variables, assignment, csp)
-    # for each value in order_domain_values(var,assignment,csp) do
-    # given the variable (var) that we have, explore all possible values that you can assign
-        # if value is consistent with assignment given constraints[csp] then
-        # adjacent nodes cannot have the same color - check is consistent with the current assignments
-            # add {var = value} to assignment
-            # result <- recursive_backtracking(assignment,csp)
-            # if result not equal failure then return result
-            # remove {var = value} from assignment
+    var = plain_select_unassigned_variable(csp.variables, assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
+    print("var", var)
+    for value in plain_order_domain_values(var, assignment, csp):
+        # given the variable (var) that we have, explore all possible values that you can assign
+        if consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
+            # adjacent nodes cannot have the same color - check is consistent with the current assignments
+            assignment[var] = value # add {var = value} to assignment
+            print("a", assignment)
+            result = plain_recursive_backtracking(assignment, csp)
+            if (result): # if result not equal failure then return result
+                return result
+            assignment.pop(var, None) # remove {var = value} from assignment
     return False
-
 
 '''
 # writes the solution path array to the output file
