@@ -1,4 +1,3 @@
-from os import unlink
 import sys
 
 # -------------------------------------------------------
@@ -22,21 +21,24 @@ class CSP:
         self.n = int(n) # n variables
         self.m = int(m) # m constraints
         self.k = int(k) # k possible colors
+        self.domain = self.set_domain()
         self.variables = self.set_variables() # array of nodes
         self.constraints = constraints
     
-    def set_variables(self):
-        variables = []
+    def set_domain(self):
         domain = []
         for color in range(self.k):
             domain.append(color)
+        return domain
+
+    def set_variables(self):
+        variables = []
         for key in range(self.n):
-            node = Node(str(key), domain)
+            node = Node(str(key), self.domain)
             variables.append(node)
         return variables
 
     def get_node(self, key):
-        print("vars", self.variables)
         for node in self.variables:
             if (node.key == key):
                 return node
@@ -167,23 +169,17 @@ def improved_order_domain_values(var, assignment, csp):
     values_remain = {}
     # assume the value for the variable and 
     # use the constraint graph to check how many values remain for the other variables
-    print("var", var.key)
     for value in var.domain: # possible values for var
         counter = 0 # amount of choices
-        print("---color", value)
         for constraint in csp.constraints:
-            print("con", constraint)
             if (var.key in constraint):
                 neighbor = constraint[constraint.index(var.key)-1]
-                print("n", neighbor)
                 neighbor_node = csp.get_node(neighbor)
                 if (value in neighbor_node.domain):
                     counter += (len(neighbor_node.domain)-1)
                 else:
                     counter += len(neighbor_node.domain)
         values_remain[value] = counter
-    print(values_remain)
-    print("go over this later")
     ordered_domains = sorted(values_remain, key=values_remain.get)
     ordered_domains = ordered_domains[::-1] # greatest amount of choices to least
     return ordered_domains
@@ -192,6 +188,8 @@ def improved_consistent(var, value, assignment, csp):
     # use AC3
     # use forward checking
     print("incomplete")
+    
+
     return (plain_consistent(var, value, assignment, csp))
 
 def improved_backtracking_search(csp):
@@ -204,10 +202,14 @@ def improved_recursive_backtracking(assignment, csp):
     for value in improved_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
         if improved_consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
             assignment[var.key] = value # add {var = value} to assignment
+            # trim domain
+            var.domain = []
+            var.domain.append(value)
             result = improved_recursive_backtracking(assignment, csp)
             if (result): # if result not equal failure then return result
                 return result
             assignment.pop(var.key, None) # remove {var = value} from assignment
+            var.domain = csp.domain # reset domain
     return False
 
 # -------------------------------------------------------
@@ -225,6 +227,6 @@ if __name__ == '__main__':
     output = (sys.argv[2]) # OUTPUT FILE PATH
     mode = (sys.argv[3]) # MODE FLAG
     
-    # print(plain_backtracking_search(input_to_csp(input)))
-    # print("---")
+    print(plain_backtracking_search(input_to_csp(input)))
+    print("---")
     print(improved_backtracking_search(input_to_csp(input)))
