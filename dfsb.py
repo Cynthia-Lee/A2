@@ -43,6 +43,14 @@ class CSP:
             if (node.key == key):
                 return node
         return False
+    
+    def get_neighbors(self, node):
+        neighbors = []
+        for constraint in self.constraints:
+            if (node.key in constraint):
+                neighbor = constraint[constraint.index(node.key)-1]
+                neighbors.append(neighbor)
+        return neighbors
 
 def is_complete(assignment, csp): # assignment is the path taken
     if (len(assignment) != csp.n):
@@ -87,12 +95,10 @@ def plain_order_domain_values(var, assignment, csp):
     return var.domain
 
 def plain_consistent(var, value, assignment, csp): # adjacent nodes cannot have the same color - check is consistent with the current assignments
-    for constraint in csp.constraints:
-        if (var.key in constraint):
-            neighbor = constraint[constraint.index(var.key)-1]
-            # check that adjacent node does not have the same color
-            if ((neighbor in assignment) and assignment[neighbor] == value):
-                return False
+    neighbors = csp.get_neighbors(var)
+    for neighbor in neighbors:
+        if ((neighbor in assignment) and assignment[neighbor] == value):
+            return False
     return True
 
 def plain_backtracking_search(csp):
@@ -171,24 +177,31 @@ def improved_order_domain_values(var, assignment, csp):
     # use the constraint graph to check how many values remain for the other variables
     for value in var.domain: # possible values for var
         counter = 0 # amount of choices
-        for constraint in csp.constraints:
-            if (var.key in constraint):
-                neighbor = constraint[constraint.index(var.key)-1]
-                neighbor_node = csp.get_node(neighbor)
-                if (value in neighbor_node.domain):
-                    counter += (len(neighbor_node.domain)-1)
-                else:
-                    counter += len(neighbor_node.domain)
+        neighbors = csp.get_neighbors(var)
+        for neighbor in neighbors:
+            neighbor_node = csp.get_node(neighbor)
+            if (value in neighbor_node.domain):
+                counter += (len(neighbor_node.domain)-1)
+            else:
+                counter += len(neighbor_node.domain)
         values_remain[value] = counter
     ordered_domains = sorted(values_remain, key=values_remain.get)
     ordered_domains = ordered_domains[::-1] # greatest amount of choices to least
     return ordered_domains
 
 def improved_consistent(var, value, assignment, csp):
-    # use AC3
-    # use forward checking
+    # pruning domains
+    # use forward checking and use AC3
     print("incomplete")
+
+    # forward checking
+    # when a variable is assigned a value
+    # prune incompatible values from the domain of its neighbors
     
+
+    # constraint propagation
+    # arc consistency
+
 
     return (plain_consistent(var, value, assignment, csp))
 
