@@ -1,3 +1,4 @@
+from os import unlink
 import sys
 
 # -------------------------------------------------------
@@ -17,7 +18,7 @@ class CSP:
         self.n = int(n) # n variables
         self.m = int(m) # m constraints
         self.k = int(k) # k possible colors
-        self.variables = self.set_variables()
+        self.variables = self.set_variables() # array of nodes
         self.constraints = constraints
     
     def set_variables(self):
@@ -123,32 +124,28 @@ def count_constraints(csp):
         count[v] += 1
     return count
 
-# def mvc_ordered_variables(csp):
-#     count = count_constraints(csp)
-#     ordered_variables = sorted(count, key=count.get) # sort keys based on values
-#     ordered_variables = ordered_variables[::-1] # greatest to least
-#     return ordered_variables
-
 def improved_select_unassigned_variable(assignment, csp):
     # most constrained variable, use minimum remaining values (MRV) degree heuristic
     # choose the variable with the fewest legal values
     # choose the variable with the most constraints on remaining variables
     # In case of a tie, choose the variable that is involved in the most
     # constraints on remaining variables = degree heuristic
+    unassigned = []
+    for var in csp.variables:
+        if (var.key not in assignment):
+            unassigned.append(var)
+    
     count = count_constraints(csp)
-    # csp.variables = unassigned variables
-    min = csp.variables[0]
-    for var in csp.variables[1:]: 
-        # possible remaining values for var
-        var_values = 0
-        # possible remaining values for min
-        min_values = 0
+    
+    min = unassigned[0]
+    for var in unassigned[1:]: 
+        var_values = len(var.domain) # possible remaining values for var
+        min_values = len(min.domain) # possible remaining values for min
         if (var_values < min_values): # mvc heuristic
             min = var
         elif (var_values == min_values): # degree heuristic
-            if (count[min] < count[var]): # most edges on the graph (constraints)
+            if (count[min.key] < count[var.key]): # most edges on the graph (constraints)
                 min = var
-    print(min)
     csp.variables.remove(min)
     return min
 
@@ -205,6 +202,6 @@ if __name__ == '__main__':
     output = (sys.argv[2]) # OUTPUT FILE PATH
     mode = (sys.argv[3]) # MODE FLAG
     
-    print(plain_backtracking_search(input_to_csp(input)))
+    # print(plain_backtracking_search(input_to_csp(input)))
     # print("---")
-    # print(improved_backtracking_search(input_to_csp(input)))
+    print(improved_backtracking_search(input_to_csp(input)))
