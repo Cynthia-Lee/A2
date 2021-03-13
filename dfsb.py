@@ -53,17 +53,15 @@ class CSP:
                 neighbors.append(neighbor_node)
         return neighbors
 
-    def get_unassigned(self, assignment):
+# -------------------------------------------------------
+### helpful funcitons ###
+
+def get_unassigned(csp, assignment):
         unassigned = []
-        for var in self.variables:
+        for var in csp.variables:
             if (var.key not in assignment):
                 unassigned.append(var)
         return unassigned
-
-def is_complete(assignment, csp): # assignment is the path taken
-    if (len(assignment) != csp.n):
-        return False    
-    return True
 
 # input file format
 # N variables, numbered 0 to N-1
@@ -89,9 +87,13 @@ def input_to_csp(file):
 # -------------------------------------------------------
 ### DFS-B methods (for both) ###
 
+def is_complete(assignment, csp): # assignment is the path taken
+    if (len(assignment) != csp.n):
+        return False    
+    return True
+
 def consistent(var, value, assignment, csp): # adjacent nodes cannot have the same color - check is consistent with the current assignments
-    neighbors = csp.get_neighbors(var)
-    for neighbor in neighbors:
+    for neighbor in csp.get_neighbors(var):
         if ((neighbor.key in assignment) and assignment[neighbor.key] == value):
             return False
     return True
@@ -101,7 +103,7 @@ def consistent(var, value, assignment, csp): # adjacent nodes cannot have the sa
 
 def plain_select_unassigned_variable(assignment, csp):
     # This default implementation just selects the first in the ordered list of variables provided by the CSP.
-    unassigned = csp.get_unassigned(assignment)
+    unassigned = get_unassigned(csp, assignment)
     return unassigned[0]
 
 def plain_order_domain_values(var, assignment, csp):
@@ -115,7 +117,7 @@ def plain_backtracking_search(csp):
     return plain_recursive_backtracking({}, csp)
 
 def plain_recursive_backtracking(assignment, csp): # returns solution or failure
-    if (is_complete(assignment, csp)): # if assignment is complete, return assignment (like goal test)
+    if is_complete(assignment, csp): # if assignment is complete, return assignment (like goal test)
         return assignment
     var = plain_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
     for value in plain_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
@@ -157,7 +159,7 @@ def improved_select_unassigned_variable(assignment, csp):
     # choose the variable with the most constraints on remaining variables
     # In case of a tie, choose the variable that is involved in the most
     # constraints on remaining variables = degree heuristic
-    unassigned = csp.get_unassigned(assignment)
+    unassigned = get_unassigned(csp, assignment)
     
     count = count_constraints(csp)
     
@@ -182,8 +184,7 @@ def improved_order_domain_values(var, assignment, csp):
     # use the constraint graph to check how many values remain for the other variables
     for value in var.domain: # possible values for var
         counter = 0 # amount of choices
-        neighbors = csp.get_neighbors(var)
-        for neighbor in neighbors:
+        for neighbor in csp.get_neighbors(var):
             if (value in neighbor.domain):
                 counter += (len(neighbor.domain)-1)
             else:
@@ -201,16 +202,24 @@ def inference(csp, var, value):
     # forward checking
     # when a variable is assigned a value
     # prune incompatible values from the domain of its neighbors
-    
+    print("look", var.key)
+    for xj in csp.get_neighbors(var): # for all xj exsits in neighbors (of xi)
+        # pruning xj when xi = a
+        for b in xj.domain: # for all b exists in domain (of xj)
+            print("b", b)
+            if (): # xi = a AND xj = b is incompatible (according to constraint)
+                print()
+                # then remove b from domain (xj)
 
     # constraint propagation
     # arc consistency
+    print()
 
 def improved_backtracking_search(csp):
     return improved_recursive_backtracking({}, csp)
 
 def improved_recursive_backtracking(assignment, csp):
-    if (is_complete(assignment, csp)): # if assignment is complete, return assignment (like goal test)
+    if is_complete(assignment, csp): # if assignment is complete, return assignment (like goal test)
         return assignment
     var = improved_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
     for value in improved_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
