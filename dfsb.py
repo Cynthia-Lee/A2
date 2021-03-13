@@ -53,6 +53,13 @@ class CSP:
                 neighbors.append(neighbor_node)
         return neighbors
 
+    def get_unassigned(self, assignment):
+        unassigned = []
+        for var in self.variables:
+            if (var.key not in assignment):
+                unassigned.append(var)
+        return unassigned
+
 def is_complete(assignment, csp): # assignment is the path taken
     if (len(assignment) != csp.n):
         return False    
@@ -80,27 +87,27 @@ def input_to_csp(file):
     return csp
 
 # -------------------------------------------------------
-### Plain DFS-B ###
+### DFS-B methods (for both) ###
 
-def plain_select_unassigned_variable(assignment, csp):
-    # variables is unassigned items
-    # This default implementation just selects the first in the ordered list of variables provided by the CSP.
-    for var in csp.variables:
-        if (var.key not in assignment):
-            return var
-    return False
-
-def plain_order_domain_values(var, assignment, csp):
-    # Primitive operation, ordering the domain values of the specified variable. 
-    # This default implementation just takes the default order provided by the CSP.
-    return var.domain
-
-def plain_consistent(var, value, assignment, csp): # adjacent nodes cannot have the same color - check is consistent with the current assignments
+def consistent(var, value, assignment, csp): # adjacent nodes cannot have the same color - check is consistent with the current assignments
     neighbors = csp.get_neighbors(var)
     for neighbor in neighbors:
         if ((neighbor.key in assignment) and assignment[neighbor.key] == value):
             return False
     return True
+
+# -------------------------------------------------------
+### Plain DFS-B ###
+
+def plain_select_unassigned_variable(assignment, csp):
+    # This default implementation just selects the first in the ordered list of variables provided by the CSP.
+    unassigned = csp.get_unassigned(assignment)
+    return unassigned[0]
+
+def plain_order_domain_values(var, assignment, csp):
+    # Primitive operation, ordering the domain values of the specified variable. 
+    # This default implementation just takes the default order provided by the CSP.
+    return var.domain
 
 def plain_backtracking_search(csp):
     # plain DFS, traverse the node tree depth first order
@@ -112,7 +119,7 @@ def plain_recursive_backtracking(assignment, csp): # returns solution or failure
         return assignment
     var = plain_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
     for value in plain_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
-        if plain_consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
+        if consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
             assignment[var.key] = value # add {var = value} to assignment
             result = plain_recursive_backtracking(assignment, csp)
             if (result): # if result not equal failure then return result
@@ -129,7 +136,7 @@ def plain_recursive_backtracking(assignment, csp): # returns solution or failure
     # Most constrained variable, Minimum remaining values (MRV) heuristic 
 # Value ordering (order-domain-values)
     # Least constraining value, (LCV) heuristic
-# Constraint propagation (is-consistent) (inference)
+# Constraint propagation (inference)
     # AC3, arc consistency
     # Forward checking
 
@@ -150,10 +157,7 @@ def improved_select_unassigned_variable(assignment, csp):
     # choose the variable with the most constraints on remaining variables
     # In case of a tie, choose the variable that is involved in the most
     # constraints on remaining variables = degree heuristic
-    unassigned = []
-    for var in csp.variables:
-        if (var.key not in assignment):
-            unassigned.append(var)
+    unassigned = csp.get_unassigned(assignment)
     
     count = count_constraints(csp)
     
@@ -189,8 +193,8 @@ def improved_order_domain_values(var, assignment, csp):
     ordered_domains = ordered_domains[::-1] # greatest amount of choices to least
     return ordered_domains
 
-def improved_consistent(var, value, assignment, csp):
-    # pruning domains
+def inference(csp, var, value):
+    # pruning domains (prune out values form the CSP)
     # use forward checking and use AC3
     print("incomplete")
 
@@ -202,9 +206,6 @@ def improved_consistent(var, value, assignment, csp):
     # constraint propagation
     # arc consistency
 
-
-    return (plain_consistent(var, value, assignment, csp))
-
 def improved_backtracking_search(csp):
     return improved_recursive_backtracking({}, csp)
 
@@ -213,11 +214,15 @@ def improved_recursive_backtracking(assignment, csp):
         return assignment
     var = improved_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
     for value in improved_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
-        if improved_consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
+        if consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
             assignment[var.key] = value # add {var = value} to assignment
-            # trim domain
-            var.domain = []
-            var.domain.append(value)
+            var.domain = [value] # set domain
+
+            inferences = inference(csp, var, value)
+            if inferences:
+                # add inferences to the assignment
+                print("TRUE")
+                
             result = improved_recursive_backtracking(assignment, csp)
             if (result): # if result not equal failure then return result
                 return result
