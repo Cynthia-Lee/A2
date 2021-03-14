@@ -202,11 +202,15 @@ def forward_checking(csp, var, value):
     # terminate when any variable has no legal values
     for xj in csp.get_neighbors(var): # for all xj exsits in neighbors (of xi)
         # pruning xj when xi = a
-        for b in xj.domain: # for all b exists in domain (of xj)
-            if (value == b): # xi = a AND xj = b is incompatible (according to constraint)
-                xj.domain.remove(b) # then remove b from domain (xj)
+        new_dom = copy(xj.domain)
+        if value in xj.domain:
+            new_dom.remove(value)
+            xj.domain = new_dom       
+        # for b in xj.domain: # for all b exists in domain (of xj)
+        #     if (value == b): # xi = a AND xj = b is incompatible (according to constraint)
+        #         xj.domain.remove(b) # then remove b from domain (xj)
         if (not xj.domain): # xj has no legal values
-            return False
+            return False   
     return csp
 
 def copy(arr):
@@ -229,6 +233,7 @@ def remove_inconsistent_values(xi, xj):
     return removed
 
 def ac3(csp):
+    print("TEST AC3")
     # arc consistency
     # prune domains of a variable whenever the domains of its neighbors change
     queue = copy(csp.constraints) # queue of arcs, initially all the arcs in csp
@@ -250,20 +255,9 @@ def ac3(csp):
         # if domain of xi was pruned
             # add all arcs xk -> xi to the queue
     
-    return csp # returns ths csp, possible with reduced domains
+    # returns ths csp, possible with reduced domains
+    return csp
 
-def inference(csp, var, value):
-    # pruning domains (prune out values form the CSP)
-    # use forward checking and use AC3
-    
-    print("inference")
-    # forward checking
-    f_check = forward_checking(csp,var,value)
-    
-    # constraint propagation
-    # arc consistency
-    ac3(csp)
-    
     # an arc xi -> xj is consistent if:
         # a exists domain (xi) 
         # b exists domain (xj)
@@ -280,7 +274,22 @@ def inference(csp, var, value):
     # • Arc consistency detects failure earlier than forward checking
     # • Can be run as a preprocessor or after each assignment
 
-    print()
+def inference(csp, var, value):
+    # pruning domains (prune out values form the CSP) using forward checking and using AC3
+    print("inference")
+    # forward checking
+    f_check = forward_checking(csp,var,value)
+    # constraint propagation
+    # arc consistency
+    print("before ac3 check")
+    for v in csp.variables:
+        print(v.key, v.domain)
+    # a_check = ac3(csp)
+    a_check = True
+    print("after ac3 check")
+    for v in csp.variables:
+        print(v.key, v.domain)
+    return f_check and a_check
 
 def improved_backtracking_search(csp):
     return improved_recursive_backtracking({}, csp)
@@ -297,7 +306,10 @@ def improved_recursive_backtracking(assignment, csp):
             inferences = inference(csp, var, value)
             if inferences:
                 # add inferences to the assignment
-                print("TRUE")
+                print()
+                # for v in csp.variables:
+                    # print("should add")
+                    # print(v.key, v.domain)
                 
             result = improved_recursive_backtracking(assignment, csp)
             if (result): # if result not equal failure then return result
