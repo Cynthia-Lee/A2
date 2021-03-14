@@ -81,7 +81,6 @@ def input_to_csp(file):
         c = line.split()
         constraints.append((c[0], c[1]))
     csp = CSP(n, m, k, constraints)
-    print("constraints", constraints)
     return csp
 
 # -------------------------------------------------------
@@ -304,7 +303,7 @@ def improved_recursive_backtracking(assignment, csp):
                 return result
             assignment.pop(var.key, None) # remove {var = value} from assignment
             var.domain = csp.domain # reset domain
-    return False
+    return True
 
 # -------------------------------------------------------
 ### Main class ###
@@ -320,7 +319,17 @@ if __name__ == '__main__':
     input = (sys.argv[1]) # INPUT FILE PATH
     output = (sys.argv[2]) # OUTPUT FILE PATH
     mode = (sys.argv[3]) # MODE FLAG
-    
-    print(plain_backtracking_search(input_to_csp(input)))
-    print("---")
-    print(improved_backtracking_search(input_to_csp(input)))
+    csp = input_to_csp(input)
+    assignment = []
+
+    if (mode == '0'): # plain DFS-B
+        assignment = plain_backtracking_search(csp)
+    elif (mode == '1'): # improved DFS-B
+        assignment = improved_backtracking_search(csp)
+
+    print("constraints", csp.constraints)
+    print("result", assignment)
+
+    # print(plain_backtracking_search(input_to_csp(input)))
+    # print("---")
+    # print(improved_backtracking_search(input_to_csp(input)))
