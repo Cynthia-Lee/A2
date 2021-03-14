@@ -200,38 +200,49 @@ def forward_checking(csp, var, value):
     # when a variable is assigned a value
     # prune incompatible values from the domain of its neighbors
     # terminate when any variable has no legal values
-    print("node is", var.key, "with value", value)
     for xj in csp.get_neighbors(var): # for all xj exsits in neighbors (of xi)
         # pruning xj when xi = a
-        print("neighbor xj", xj.key, "domain is", xj.domain)
         for b in xj.domain: # for all b exists in domain (of xj)
             if (value == b): # xi = a AND xj = b is incompatible (according to constraint)
-                # then remove b from domain (xj)
-                xj.domain.remove(b)
-                print("new xj domain", xj.domain)
-                if (not xj.domain):
-                    return False
+                xj.domain.remove(b) # then remove b from domain (xj)
+        if (not xj.domain): # xj has no legal values
+            return False
     return csp
+
+def copy(arr):
+    new = []
+    for element in arr:
+        new.append(element)
+    return new
+
+def remove_inconsistent_values(xi, xj):
+    # prune domain of xi based on xj
+    removed = False
+    for x in xi.domain: # for each x in Domain[xi] do
+        # if no value y in Domain[xj] allows (x,y) to satisfy the constraint Xi -> Xj
+        check = copy(xj.domain)
+        if x in check:
+            check.remove(x)
+        if not check: # if arr is empty
+            xi.domain.remove(x) # then delete x from Domain[xi]
+            removed = True
+    return removed
 
 def ac3(csp):
     # arc consistency
     # prune domains of a variable whenever the domains of its neighbors change
-    queue = [] # queue of arcs, initially all the arcs in csp
+    queue = copy(csp.constraints) # queue of arcs, initially all the arcs in csp
 
-    return csp # returns ths csp, possible with reduced domains
+    while queue: # while queue is not empty
+        arc = queue.pop(0) # (xi, xj) <- remove-first(queue)
+        xi = csp.get_node(arc[0])
+        xj = csp.get_node(arc[1])
+        if remove_inconsistent_values(xi, xj): # remove-inconsistent-values(xi,xj) then
+            for xk in csp.get_neighbors(xi): # for each xk in neighbors[xi] do
+                queue.append((xk.key, xi.key))
+    # if you remove anything from a variable, 
+    # then add all arcs that go into that variable back into the queue
 
-def remove_inconsistent_values(xi, xj):
-    print()
-
-def inference(csp, var, value):
-    # pruning domains (prune out values form the CSP)
-    # use forward checking and use AC3
-    print("inference")
-    # forward checking
-    forward_checking(csp,var,value)
-    # constraint propagation
-    # arc consistency
-    
     # keep a queue of arcs tail(var) -> head(var)
     # until queue is empty:
         # pop an arc xi -> xj from queue
@@ -239,11 +250,35 @@ def inference(csp, var, value):
         # if domain of xi was pruned
             # add all arcs xk -> xi to the queue
     
+    return csp # returns ths csp, possible with reduced domains
+
+def inference(csp, var, value):
+    # pruning domains (prune out values form the CSP)
+    # use forward checking and use AC3
+    
+    print("inference")
+    # forward checking
+    f_check = forward_checking(csp,var,value)
+    
+    # constraint propagation
+    # arc consistency
+    ac3(csp)
+    
     # an arc xi -> xj is consistent if:
         # a exists domain (xi) 
         # b exists domain (xj)
         # such that: 
         # xi = 1 and xj = b is consistent with constraitns (CSP)
+
+        # for every value x at X there is some allowed y, i.e., there is at
+        # least 1 value of Y that is consistent with x
+
+    # X -> Y is consistent iff
+        # for every value x at X there is some allowed y; if not, delete x
+    
+    # • If X loses a value, all neighbors of X need to be rechecked
+    # • Arc consistency detects failure earlier than forward checking
+    # • Can be run as a preprocessor or after each assignment
 
     print()
 
