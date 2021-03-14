@@ -160,7 +160,6 @@ def improved_select_unassigned_variable(assignment, csp):
     # In case of a tie, choose the variable that is involved in the most
     # constraints on remaining variables = degree heuristic
     unassigned = get_unassigned(csp, assignment)
-    
     count = count_constraints(csp)
     
     min = unassigned[0]
@@ -179,40 +178,49 @@ def improved_order_domain_values(var, assignment, csp):
     # the one that rules out the fewest values in the remaining variables
     # try to pick values best first
     ordered_domains = []
-    values_remain = {}
+    values_remain = {} # key = color, value = total number of values remaining for other variables
+
     # assume the value for the variable and 
     # use the constraint graph to check how many values remain for the other variables
-    for value in var.domain: # possible values for var
+    for value in var.domain:
         counter = 0 # amount of choices
-        for neighbor in csp.get_neighbors(var):
+        for neighbor in csp.get_neighbors(var): # neighbor (from constraint)
             if (value in neighbor.domain):
                 counter += (len(neighbor.domain)-1)
             else:
                 counter += len(neighbor.domain)
         values_remain[value] = counter
+
     ordered_domains = sorted(values_remain, key=values_remain.get)
     ordered_domains = ordered_domains[::-1] # greatest amount of choices to least
     return ordered_domains
 
-def inference(csp, var, value):
-    # pruning domains (prune out values form the CSP)
-    # use forward checking and use AC3
-    print("incomplete")
-
+def forward_checking(csp, var, value):
     # forward checking
     # when a variable is assigned a value
     # prune incompatible values from the domain of its neighbors
-    print("look", var.key)
+    print("node is", var.key, "with value", value)
     for xj in csp.get_neighbors(var): # for all xj exsits in neighbors (of xi)
         # pruning xj when xi = a
+        print("neighbor xj", xj.key, "domain is", xj.domain)
         for b in xj.domain: # for all b exists in domain (of xj)
-            print("b", b)
-            if (): # xi = a AND xj = b is incompatible (according to constraint)
-                print()
+            if (value == b): # xi = a AND xj = b is incompatible (according to constraint)
                 # then remove b from domain (xj)
+                xj.domain.remove(b)
+                print("new xj domain", xj.domain)
 
+def ac3():
+    print()
+
+def inference(csp, var, value):
+    # pruning domains (prune out values form the CSP)
+    # use forward checking and use AC3
+    print("inference")
+    # forward checking
+    forward_checking(csp,var,value)
     # constraint propagation
     # arc consistency
+    
     print()
 
 def improved_backtracking_search(csp):
