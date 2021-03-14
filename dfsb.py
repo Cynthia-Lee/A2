@@ -233,7 +233,6 @@ def remove_inconsistent_values(xi, xj):
     return removed
 
 def ac3(csp):
-    print("TEST AC3")
     # arc consistency
     # prune domains of a variable whenever the domains of its neighbors change
     queue = copy(csp.constraints) # queue of arcs, initially all the arcs in csp
@@ -276,19 +275,11 @@ def ac3(csp):
 
 def inference(csp, var, value):
     # pruning domains (prune out values form the CSP) using forward checking and using AC3
-    print("inference")
     # forward checking
     f_check = forward_checking(csp,var,value)
     # constraint propagation
     # arc consistency
-    print("before ac3 check")
-    for v in csp.variables:
-        print(v.key, v.domain)
-    # a_check = ac3(csp)
-    a_check = True
-    print("after ac3 check")
-    for v in csp.variables:
-        print(v.key, v.domain)
+    a_check = ac3(csp)
     return f_check and a_check
 
 def improved_backtracking_search(csp):
@@ -302,15 +293,12 @@ def improved_recursive_backtracking(assignment, csp):
         if consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
             assignment[var.key] = value # add {var = value} to assignment
             var.domain = [value] # set domain
-
             inferences = inference(csp, var, value)
             if inferences:
                 # add inferences to the assignment
-                print()
-                # for v in csp.variables:
-                    # print("should add")
-                    # print(v.key, v.domain)
-                
+                for inference_var in csp.variables:
+                    if len(inference_var.domain) == 1:
+                        assignment[inference_var.key] = inference_var.domain[0]           
             result = improved_recursive_backtracking(assignment, csp)
             if (result): # if result not equal failure then return result
                 return result
