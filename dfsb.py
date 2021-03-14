@@ -199,6 +199,7 @@ def forward_checking(csp, var, value):
     # forward checking
     # when a variable is assigned a value
     # prune incompatible values from the domain of its neighbors
+    # terminate when any variable has no legal values
     print("node is", var.key, "with value", value)
     for xj in csp.get_neighbors(var): # for all xj exsits in neighbors (of xi)
         # pruning xj when xi = a
@@ -208,8 +209,18 @@ def forward_checking(csp, var, value):
                 # then remove b from domain (xj)
                 xj.domain.remove(b)
                 print("new xj domain", xj.domain)
+                if (not xj.domain):
+                    return False
+    return csp
 
-def ac3():
+def ac3(csp):
+    # arc consistency
+    # prune domains of a variable whenever the domains of its neighbors change
+    queue = [] # queue of arcs, initially all the arcs in csp
+
+    return csp # returns ths csp, possible with reduced domains
+
+def remove_inconsistent_values(xi, xj):
     print()
 
 def inference(csp, var, value):
@@ -221,6 +232,19 @@ def inference(csp, var, value):
     # constraint propagation
     # arc consistency
     
+    # keep a queue of arcs tail(var) -> head(var)
+    # until queue is empty:
+        # pop an arc xi -> xj from queue
+        # prune domain of xi based on xj's domain
+        # if domain of xi was pruned
+            # add all arcs xk -> xi to the queue
+    
+    # an arc xi -> xj is consistent if:
+        # a exists domain (xi) 
+        # b exists domain (xj)
+        # such that: 
+        # xi = 1 and xj = b is consistent with constraitns (CSP)
+
     print()
 
 def improved_backtracking_search(csp):
