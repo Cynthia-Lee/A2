@@ -105,16 +105,14 @@ def conflicts(var, assignment, csp):
 def min_conflicts(csp, max_steps, current_state):
     for i in range(max_steps): # for i ← 1 to max_steps do
         if is_complete(current_state, csp): # if current_state is a solution of csp then
-            print("FINISH")
+            print("num steps", i)
             return current_state # return current_state
         # set var ← a randomly chosen variable from the set of conflicted variables CONFLICTED[csp]
         var = random.choice(conflicted_variables(current_state, csp))
         # set value ← the value v for var that minimizes CONFLICTS(var,v,current_state,csp)
-        conflicts(csp.get_node(var), current_state, csp)
-        value = "b"
+        value = conflicts(csp.get_node(var), current_state, csp)[0]
         # set var ← value in current_state
-        var = "c" 
-
+        current_state[var] = value
     return False
 
 # algorithm MIN-CONFLICTS is
@@ -147,7 +145,7 @@ if __name__ == '__main__':
 
     state = random_state(csp)
     print("initial state", state)
-    assignment = min_conflicts(csp, 1, state)
+    assignment = min_conflicts(csp, 100, state)
 
     # write to output file
     # write_output(assignment, output)
