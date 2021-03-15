@@ -131,6 +131,24 @@ def min_conflicts(csp, max_steps, current_state):
 #     return failure
 
 # -------------------------------------------------------
+
+# writes the solution assignment to the output file
+def write_output(assignment, file):
+    if (assignment):
+        f = open(file, "w")
+        for i in sorted(assignment): 
+            color = str(assignment[i])
+            f.write(color)
+            if not i == sorted(assignment)[-1]:
+                f.write("\n")
+        f.close()
+        return True
+    else:
+        f = open(file, "w")
+        f.write("No answer")
+        f.close()
+        return False
+
 ### Main class ###
 
 if __name__ == '__main__':
@@ -148,7 +166,7 @@ if __name__ == '__main__':
     assignment = min_conflicts(csp, 100, state)
 
     # write to output file
-    # write_output(assignment, output)
+    write_output(assignment, output)
 
     print("constraints", csp.constraints)
     print("result", assignment)
