@@ -306,6 +306,18 @@ def improved_recursive_backtracking(assignment, csp):
     return True
 
 # -------------------------------------------------------
+
+# writes the solution assignment to the output file
+def write_output(assignment, file):
+    f = open(file, "w")
+    for i in sorted(assignment): 
+        color = str(assignment[i])
+        f.write(color)
+        if not i == sorted(assignment)[-1]:
+            f.write("\n")
+    f.close()
+    return True
+
 ### Main class ###
 
 if __name__ == '__main__':
@@ -326,6 +338,9 @@ if __name__ == '__main__':
         assignment = plain_backtracking_search(csp)
     elif (mode == '1'): # improved DFS-B
         assignment = improved_backtracking_search(csp)
+
+    # write to output file
+    write_output(assignment, output)
 
     print("constraints", csp.constraints)
     print("result", assignment)
