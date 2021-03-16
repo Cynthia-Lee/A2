@@ -14,6 +14,7 @@ class CSP:
         self.constraints = constraints
     
     def set_domain(self):
+        print("SCREAM")
         domain = []
         for color in range(self.k):
             domain.append(color)

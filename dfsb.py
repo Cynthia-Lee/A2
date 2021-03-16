@@ -238,7 +238,8 @@ def inference(csp, var, value, assignment):
     if not f_check: print("BAD F")
     # constraint propagation
     # arc consistency
-    a_check = ac3(csp)
+    # a_check = ac3(csp)
+    a_check = True
     if not a_check: print("BAD A")
     return f_check and a_check
 
@@ -255,11 +256,6 @@ def improved_recursive_backtracking(assignment, csp):
             assignment[var.key] = value # add {var = value} to assignment
             var.domain = [value] # set domain
             
-            # print(assignment)
-            # test = {}
-            # for a in assignment:
-            #     test[a] = assignment[a]
-
             inferences = inference(csp, var, value, assignment)
             if inferences:
                 # add inferences to the assignment
@@ -270,15 +266,10 @@ def improved_recursive_backtracking(assignment, csp):
                 result = improved_recursive_backtracking(assignment, csp)
                 if (result): # if result not equal failure then return result
                     return result
-            
-            # assignment fails
-            # remove inferences from assignment (restore domains)
-            # assignment = test
-            # for t in csp.variables:
-            #     t.domain = csp.domain
 
-            assignment.pop(var.key, None) # remove {var = value} from assignment
-            var.domain = csp.domain # reset domain
+            assignment.pop(var.key, None) # remove {var = value} and inferences from assignment
+            var.domain = [0, 1, 2, 3] # reset domain
+            print("fail global dom", var.domain, csp.domain)
     return False
 
 # -------------------------------------------------------
@@ -302,7 +293,7 @@ if __name__ == '__main__':
     # A sample execution of dfsb.py should be as below:
         # python dfsb.py <INPUT FILE> <OUTPUT FILE> <MODE FLAG>.
     # <MODE FLAG> can be either 0 (plain DFS-B) or 1 (improved DFS-B).
-    
+
     # (sys.argv[0]) # dfsb.py
     input = (sys.argv[1]) # INPUT FILE PATH
     output = (sys.argv[2]) # OUTPUT FILE PATH
@@ -320,9 +311,10 @@ if __name__ == '__main__':
 
     print("constraints", csp.constraints)
     print("result", assignment)
-    
+
     # print(plain_backtracking_search(input_to_csp(input)))
     # print("---")
     # print(improved_backtracking_search(input_to_csp(input)))
 
     # print(improved_backtracking_search(input_to_csp("backtrack_easy")))
+    # print(improved_backtracking_search(input_to_csp("backtrack_hard")))
