@@ -1,6 +1,7 @@
 import sys
 import random
 from CSP import CSP
+import datetime
 
 # -------------------------------------------------------
 # Sources used:
@@ -107,8 +108,10 @@ def min_conflicts(csp, max_steps, current_state):
         if is_complete(current_state, csp): # if current_state is a solution of csp then
             print("num steps", i)
             return current_state # return current_state
+        
+        conflicted = conflicted_variables(current_state, csp)
         # set var ← a randomly chosen variable from the set of conflicted variables CONFLICTED[csp]
-        var = random.choice(conflicted_variables(current_state, csp))
+        var = random.choice(conflicted)            
         # set value ← the value v for var that minimizes CONFLICTS(var,v,current_state,csp)
         value = conflicts(csp.get_node(var), current_state, csp)[0]
         # set var ← value in current_state
@@ -129,6 +132,20 @@ def min_conflicts(csp, max_steps, current_state):
 #         set var ← value in current_state
 
 #     return failure
+
+def min_conflicts_solver(csp):
+    state = random_state(csp)
+    print("initial state", state)
+    assignment = min_conflicts(csp, 2000, random_state(csp))
+    time_elapsed = 0
+    while (not assignment): # and time_elapsed < 30):
+        print(assignment)
+        start = datetime.datetime.now()
+        assignment = min_conflicts(csp, 2000, random_state(csp))
+        end = datetime.datetime.now()
+        time_elapsed = end - start
+        print("te", time_elapsed)
+    return assignment
 
 # -------------------------------------------------------
 
@@ -161,9 +178,7 @@ if __name__ == '__main__':
     csp = input_to_csp(input)
     assignment = []
 
-    state = random_state(csp)
-    print("initial state", state)
-    assignment = min_conflicts(csp, 100, state)
+    assignment = min_conflicts_solver(csp)
 
     # write to output file
     write_output(assignment, output)
