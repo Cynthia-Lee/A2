@@ -104,10 +104,12 @@ def conflicts(var, assignment, csp):
     return ordered_conflicts
 
 def min_conflicts(csp, max_steps, current_state):
+    steps = 0
     for i in range(max_steps): # for i ← 1 to max_steps do
         if is_complete(current_state, csp): # if current_state is a solution of csp then
             return current_state # return current_state
-        
+        steps += 1
+        print(steps)
         conflicted = conflicted_variables(current_state, csp)
         # set var ← a randomly chosen variable from the set of conflicted variables CONFLICTED[csp]
         var = random.choice(conflicted)            
@@ -133,6 +135,7 @@ def min_conflicts(csp, max_steps, current_state):
 #     return failure
 
 def min_conflicts_solver(csp):
+    num = 0
     assignment = min_conflicts(csp, 2000, random_state(csp))
     expire = False
     start = datetime.datetime.now()
@@ -140,7 +143,8 @@ def min_conflicts_solver(csp):
         assignment = min_conflicts(csp, 2000, random_state(csp))
         end = datetime.datetime.now()
         time_elapsed = (end - start)
-        print("try")
+        num += 1
+        print("trial", num)
         if time_elapsed > datetime.timedelta(seconds=30):
             print("around 30 seconds have past")
             expire = True
@@ -181,7 +185,7 @@ if __name__ == '__main__':
     assignment = min_conflicts_solver(csp)
 
     # write to output file
-    # write_output(assignment, output)
+    write_output(assignment, output)
 
     print("constraints", csp.constraints)
     print("result", assignment)

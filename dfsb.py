@@ -151,22 +151,24 @@ def improved_order_domain_values(var, assignment, csp):
     ordered_domains = ordered_domains[::-1] # greatest amount of choices to least
     return ordered_domains
 
-def forward_checking(csp, var, value):
+def forward_checking(csp, var, value, assignment):
     # forward checking
     # when a variable is assigned a value
     # prune incompatible values from the domain of its neighbors
     # terminate when any variable has no legal values
+    unassigned = get_unassigned(csp, assignment)
     for xj in csp.get_neighbors(var): # for all xj exsits in neighbors (of xi)
-        # pruning xj when xi = a
-        new_dom = copy(xj.domain)
-        if value in xj.domain:
-            new_dom.remove(value)
-            xj.domain = new_dom       
-        # for b in xj.domain: # for all b exists in domain (of xj)
-        #     if (value == b): # xi = a AND xj = b is incompatible (according to constraint)
-        #         xj.domain.remove(b) # then remove b from domain (xj)
-        if (not xj.domain): # xj has no legal values
-            return False   
+        if (xj in unassigned):
+            # pruning xj when xi = a
+            new_dom = copy(xj.domain)
+            if value in xj.domain:
+                new_dom.remove(value)
+                xj.domain = new_dom       
+            # for all b exists in domain (of xj)
+                # xi = a AND xj = b is incompatible (according to constraint)
+                    # xj.domain.remove(b) # then remove b from domain (xj)
+            if (not xj.domain): # xj has no legal values
+                return False   
     return csp
 
 def copy(arr):
@@ -229,13 +231,15 @@ def ac3(csp):
     # • Arc consistency detects failure earlier than forward checking
     # • Can be run as a preprocessor or after each assignment
 
-def inference(csp, var, value):
+def inference(csp, var, value, assignment):
     # pruning domains (prune out values form the CSP) using forward checking and using AC3
     # forward checking
-    f_check = forward_checking(csp,var,value)
+    f_check = forward_checking(csp,var,value, assignment)
+    if not f_check: print("BAD F")
     # constraint propagation
     # arc consistency
     a_check = ac3(csp)
+    if not a_check: print("BAD A")
     return f_check and a_check
 
 def improved_backtracking_search(csp):
@@ -245,22 +249,37 @@ def improved_recursive_backtracking(assignment, csp):
     if is_complete(assignment, csp): # if assignment is complete, return assignment (like goal test)
         return assignment
     var = improved_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
+    print("d", var.key, var.domain)
     for value in improved_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
         if consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
             assignment[var.key] = value # add {var = value} to assignment
             var.domain = [value] # set domain
-            inferences = inference(csp, var, value)
+            
+            # print(assignment)
+            # test = {}
+            # for a in assignment:
+            #     test[a] = assignment[a]
+
+            inferences = inference(csp, var, value, assignment)
             if inferences:
                 # add inferences to the assignment
                 for inference_var in csp.variables:
                     if len(inference_var.domain) == 1:
-                        assignment[inference_var.key] = inference_var.domain[0]           
-            result = improved_recursive_backtracking(assignment, csp)
-            if (result): # if result not equal failure then return result
-                return result
+                        assignment[inference_var.key] = inference_var.domain[0]
+
+                result = improved_recursive_backtracking(assignment, csp)
+                if (result): # if result not equal failure then return result
+                    return result
+            
+            # assignment fails
+            # remove inferences from assignment (restore domains)
+            # assignment = test
+            # for t in csp.variables:
+            #     t.domain = csp.domain
+
             assignment.pop(var.key, None) # remove {var = value} from assignment
             var.domain = csp.domain # reset domain
-    return True
+    return False
 
 # -------------------------------------------------------
 
@@ -295,13 +314,15 @@ if __name__ == '__main__':
         assignment = plain_backtracking_search(csp)
     elif (mode == '1'): # improved DFS-B
         assignment = improved_backtracking_search(csp)
-
+    
     # write to output file
     write_output(assignment, output)
 
     print("constraints", csp.constraints)
     print("result", assignment)
-
+    
     # print(plain_backtracking_search(input_to_csp(input)))
     # print("---")
     # print(improved_backtracking_search(input_to_csp(input)))
+
+    # print(improved_backtracking_search(input_to_csp("backtrack_easy")))
