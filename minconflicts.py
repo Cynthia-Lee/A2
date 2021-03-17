@@ -145,7 +145,7 @@ def min_conflicts_solver(csp):
         time_elapsed = (end - start)
         num += 1
         print("trial", num)
-        if time_elapsed > datetime.timedelta(seconds=30):
+        if time_elapsed > datetime.timedelta(seconds=60):
             print("around 30 seconds have past")
             expire = True
             return False
