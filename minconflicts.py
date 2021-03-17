@@ -136,11 +136,11 @@ def min_conflicts(csp, max_steps, current_state):
 
 def min_conflicts_solver(csp):
     num = 0
-    assignment = min_conflicts(csp, 2000, random_state(csp))
+    assignment = min_conflicts(csp, 1000, random_state(csp))
     expire = False
     start = datetime.datetime.now()
     while (not assignment or expire): # and time_elapsed < 30):
-        assignment = min_conflicts(csp, 2000, random_state(csp))
+        assignment = min_conflicts(csp, 1000, random_state(csp))
         end = datetime.datetime.now()
         time_elapsed = (end - start)
         num += 1
