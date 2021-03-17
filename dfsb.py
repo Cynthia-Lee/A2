@@ -243,8 +243,7 @@ def ac3(csp):
 def inference(csp, var, value, assignment):
     # pruning domains (prune out values form the CSP) using forward checking and using AC3
     # forward checking
-    # f_check = forward_checking(csp,var,value, assignment)
-    f_check = True
+    f_check = forward_checking(csp,var,value, assignment)
     # constraint propagation
     # arc consistency
     a_check = ac3(csp)
