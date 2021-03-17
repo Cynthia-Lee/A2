@@ -184,6 +184,8 @@ if __name__ == '__main__':
     input = (sys.argv[1]) # INPUT FILE PATH
     output = (sys.argv[2]) # OUTPUT FILE PATH
 
+    start = datetime.datetime.now()
+
     csp = input_to_csp(input)
     assignment = []
 
@@ -192,5 +194,9 @@ if __name__ == '__main__':
     # write to output file
     write_output(assignment, output)
 
-    print("constraints", csp.constraints)
-    print("result", assignment)
+    end = datetime.datetime.now()
+    time_elapsed = (end - start)
+
+    # print("constraints", csp.constraints)
+    # print("result", assignment)
+    print("time elapsed", time_elapsed)

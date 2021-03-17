@@ -1,5 +1,8 @@
 import sys
 from CSP import CSP
+import datetime
+from CSPGenerator import CSPGenerator
+import math
 
 # -------------------------------------------------------
 # Sources used:
@@ -15,6 +18,8 @@ from CSP import CSP
 
 global states
 states = 0
+global states_list
+states_list = []
 
 def get_unassigned(csp, assignment):
         unassigned = []
@@ -82,6 +87,8 @@ def plain_recursive_backtracking(assignment, csp): # returns solution or failure
     states += 1
     if is_complete(assignment, csp): # if assignment is complete, return assignment (like goal test)
         print(states)
+        global states_list
+        states_list.append(states)
         return assignment
     var = plain_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
     for value in plain_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
@@ -271,6 +278,8 @@ def improved_recursive_backtracking(assignment, csp, colors):
     states += 1
     if is_complete(assignment, csp): # if assignment is complete, return assignment (like goal test)
         print(states)
+        global states_list
+        states_list.append(states)
         return assignment
     var = improved_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
     for value in improved_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
@@ -328,12 +337,14 @@ if __name__ == '__main__':
     # A sample execution of dfsb.py should be as below:
         # python dfsb.py <INPUT FILE> <OUTPUT FILE> <MODE FLAG>.
     # <MODE FLAG> can be either 0 (plain DFS-B) or 1 (improved DFS-B).
-    
+    '''
     # (sys.argv[0]) # dfsb.py
     input = (sys.argv[1]) # INPUT FILE PATH
     output = (sys.argv[2]) # OUTPUT FILE PATH
     mode = (sys.argv[3]) # MODE FLAG
     
+    start = datetime.datetime.now()
+
     csp = input_to_csp(input)
     assignment = []
     
@@ -345,9 +356,13 @@ if __name__ == '__main__':
     # write to output file
     write_output(assignment, output)
 
-    print("constraints", csp.constraints)
-    print("result", assignment)
-    
+    end = datetime.datetime.now()
+    time_elapsed = (end - start)
+
+    # print("constraints", csp.constraints)
+    # print("result", assignment)
+    print("time elapsed", time_elapsed)
+    '''
     # print(plain_backtracking_search(input_to_csp(input)))
     # print("---")
     # print(improved_backtracking_search(input_to_csp(input)))
@@ -355,3 +370,30 @@ if __name__ == '__main__':
     # print(improved_backtracking_search(input_to_csp("backtrack_easy")))
     # print("---")
     # print(improved_backtracking_search(input_to_csp("backtrack_hard")))
+    times = []
+
+    for i in range(20):
+        print("test", i)
+        # state = CSPGenerator(20, 100, 4, "parameter_set") # N M K
+        # state = CSPGenerator(50, 625, 4, "parameter_set") # N M K
+        # state = CSPGenerator(100, 2500, 4, "parameter_set") # N M K
+        state = CSPGenerator(200, 10000, 4, "parameter_set") # N M K
+        # state = CSPGenerator(400, 40000, 4, "parameter_set") # N M K
+        start = datetime.datetime.now()
+        csp = input_to_csp("parameter_set")
+        assignment = []
+        assignment = plain_backtracking_search(csp)
+        # assignment = improved_backtracking_search(csp)
+        write_output(assignment, "output")
+        end = datetime.datetime.now()
+        time_elapsed = (end - start)
+        print(time_elapsed)
+        times.append(time_elapsed.total_seconds())
+        print("---")
+    print(states_list)
+    x = states_list
+    mean = sum(x) / len(x)
+    print("mean", mean)
+    sd = math.sqrt(sum([(val - mean)**2 for val in x])/(len(x) - 1))
+    print("sd", sd)
+    print("times", times)
