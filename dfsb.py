@@ -243,35 +243,34 @@ def ac3(csp):
 def inference(csp, var, value, assignment):
     # pruning domains (prune out values form the CSP) using forward checking and using AC3
     # forward checking
-    f_check = forward_checking(csp,var,value, assignment)
-    if not f_check: print("BAD F")
+    # f_check = forward_checking(csp,var,value, assignment)
+    f_check = True
     # constraint propagation
     # arc consistency
     a_check = ac3(csp)
-    if not a_check: print("BAD A")
+    # a_check = True
     return f_check and a_check
 
 def improved_backtracking_search(csp):
-    return improved_recursive_backtracking({}, csp)
+    colors = []
+    for color in range(csp.k):
+        colors.append(color)
+    return improved_recursive_backtracking({}, csp, colors)
 
-def improved_recursive_backtracking(assignment, csp):
+def improved_recursive_backtracking(assignment, csp, colors):
     if is_complete(assignment, csp): # if assignment is complete, return assignment (like goal test)
         return assignment
     var = improved_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
     print("d", var.key, var.domain)
-    # if var.key == '131':
-    #     print("gogogo")
     for value in improved_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
         if consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
             assignment[var.key] = value # add {var = value} to assignment
             var.domain = [value] # set domain
-            
-            test = {}
-            restore = {}
+
+            print("og", assignment)
+            restore_assignment = {}
             for a in assignment:
-                test[a] = assignment[a]
-            for c in csp.variables:
-                restore[c.key] = c.domain
+                restore_assignment[a] = assignment[a]
 
             inferences = inference(csp, var, value, assignment)
             if inferences:
@@ -280,20 +279,23 @@ def improved_recursive_backtracking(assignment, csp):
                     if len(inference_var.domain) == 1:
                         assignment[inference_var.key] = inference_var.domain[0]
 
-                result = improved_recursive_backtracking(assignment, csp)
+                result = improved_recursive_backtracking(assignment, csp, colors)
                 if (result): # if result not equal failure then return result
                     return result
 
             # assignment fails
-            # remove inferences from assignment (restore domains)                
+            # remove inferences from assignment (restore domains)
             for c in csp.variables:
-                if (c.key in assignment) and (c.key not in test):
+                if (c.key in assignment) and (c.key not in restore_assignment):
                     assignment.pop(c.key, None)
-                c.domain = restore[c.key]
-
-            assignment.pop(var.key, None) # remove {var = value} and inferences from assignment
-            var.domain = [0, 1, 2, 3] # reset domain
-            print("pop", var.key)
+            
+            for node in get_unassigned(csp, assignment):
+                node.domain = copy(colors)
+            
+            # remove {var = value} and inferences from assignment
+            assignment.pop(var.key, None) 
+            var.domain = copy(colors) # reset domain
+            print("popped", var.key, assignment)
             print("fail global dom", var.domain, csp.domain)
     return False
 
@@ -318,7 +320,7 @@ if __name__ == '__main__':
     # A sample execution of dfsb.py should be as below:
         # python dfsb.py <INPUT FILE> <OUTPUT FILE> <MODE FLAG>.
     # <MODE FLAG> can be either 0 (plain DFS-B) or 1 (improved DFS-B).
-    '''
+    
     # (sys.argv[0]) # dfsb.py
     input = (sys.argv[1]) # INPUT FILE PATH
     output = (sys.argv[2]) # OUTPUT FILE PATH
@@ -336,10 +338,11 @@ if __name__ == '__main__':
 
     print("constraints", csp.constraints)
     print("result", assignment)
-    '''
+    
     # print(plain_backtracking_search(input_to_csp(input)))
     # print("---")
     # print(improved_backtracking_search(input_to_csp(input)))
 
     # print(improved_backtracking_search(input_to_csp("backtrack_easy")))
-    print(improved_backtracking_search(input_to_csp("backtrack_hard")))
+    # print("---")
+    # print(improved_backtracking_search(input_to_csp("backtrack_hard")))
