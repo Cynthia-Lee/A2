@@ -2,6 +2,8 @@ import sys
 import random
 from CSP import CSP
 import datetime
+from CSPGenerator import CSPGenerator
+import math
 
 # -------------------------------------------------------
 # Sources used:
@@ -15,6 +17,8 @@ import datetime
 
 global steps
 steps = 0
+global steps_list
+steps_list = []
 
 def get_unassigned(csp, assignment):
         unassigned = []
@@ -112,6 +116,8 @@ def min_conflicts(csp, max_steps, current_state):
     for i in range(max_steps): # for i ← 1 to max_steps do
         if is_complete(current_state, csp): # if current_state is a solution of csp then
             print(steps)
+            global steps_list
+            steps_list.append(steps)
             return current_state # return current_state
         conflicted = conflicted_variables(current_state, csp)
         # set var ← a randomly chosen variable from the set of conflicted variables CONFLICTED[csp]
@@ -151,7 +157,7 @@ def min_conflicts_solver(csp):
         end = datetime.datetime.now()
         time_elapsed = (end - start)
         if time_elapsed > datetime.timedelta(seconds=60):
-            print("around 30 seconds have past")
+            print("around 60 seconds have past")
             expire = True
             return False
     return assignment
@@ -179,7 +185,7 @@ def write_output(assignment, file):
 
 if __name__ == '__main__':
     # python minconicts.py <INPUT FILE> <OUTPUT FILE>.
-    
+    '''
     # (sys.argv[0]) # minconicts.py
     input = (sys.argv[1]) # INPUT FILE PATH
     output = (sys.argv[2]) # OUTPUT FILE PATH
@@ -200,3 +206,36 @@ if __name__ == '__main__':
     # print("constraints", csp.constraints)
     # print("result", assignment)
     print("time elapsed", time_elapsed)
+    '''
+
+    times = []
+
+    for i in range(20):
+        print("test", i)
+        # state = CSPGenerator(20, 100, 4, "parameter_set") # N M K
+        # state = CSPGenerator(50, 625, 4, "parameter_set") # N M K
+        # state = CSPGenerator(100, 2500, 4, "parameter_set") # N M K
+        # state = CSPGenerator(200, 10000, 4, "parameter_set") # N M K
+        state = CSPGenerator(400, 40000, 4, "parameter_set") # N M K
+        start = datetime.datetime.now()
+        csp = input_to_csp("parameter_set")
+        assignment = []
+        assignment = min_conflicts_solver(csp)
+        write_output(assignment, "output")
+        end = datetime.datetime.now()
+        time_elapsed = (end - start) * 1000.0 # milliseconds
+        print(time_elapsed)
+        times.append(time_elapsed.total_seconds())
+        print("---")
+    print(steps_list)
+    x = steps_list
+    mean = sum(x) / len(x)
+    print("mean states", mean)
+    sd = math.sqrt(sum([(val - mean)**2 for val in x])/(len(x) - 1))
+    print("sd states", sd)
+    # print("times", times)
+    x = times
+    mean = sum(x) / len(x)
+    print("mean times", mean)
+    sd = math.sqrt(sum([(val - mean)**2 for val in x])/(len(x) - 1))
+    print("sd times", sd)

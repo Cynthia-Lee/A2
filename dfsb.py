@@ -298,10 +298,11 @@ def improved_recursive_backtracking(assignment, csp, colors):
                     if len(inference_var.domain) == 1:
                         assignment[inference_var.key] = inference_var.domain[0]
 
+                states += 1
                 result = improved_recursive_backtracking(assignment, csp, colors)
                 if (result): # if result not equal failure then return result
                     return result
-
+                
             # assignment fails
             # remove inferences from assignment (restore domains)
             for c in csp.variables:
@@ -370,15 +371,16 @@ if __name__ == '__main__':
     # print(improved_backtracking_search(input_to_csp("backtrack_easy")))
     # print("---")
     # print(improved_backtracking_search(input_to_csp("backtrack_hard")))
+    
     times = []
 
     for i in range(20):
         print("test", i)
         # state = CSPGenerator(20, 100, 4, "parameter_set") # N M K
         # state = CSPGenerator(50, 625, 4, "parameter_set") # N M K
-        # state = CSPGenerator(100, 2500, 4, "parameter_set") # N M K
+        state = CSPGenerator(100, 2500, 4, "parameter_set") # N M K
         # state = CSPGenerator(200, 10000, 4, "parameter_set") # N M K
-        state = CSPGenerator(400, 40000, 4, "parameter_set") # N M K
+        # state = CSPGenerator(400, 40000, 4, "parameter_set") # N M K
         start = datetime.datetime.now()
         csp = input_to_csp("parameter_set")
         assignment = []
