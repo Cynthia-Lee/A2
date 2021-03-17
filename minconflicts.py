@@ -111,13 +111,11 @@ def conflicts(var, assignment, csp):
     return ordered_conflicts
 
 def min_conflicts(csp, max_steps, current_state):
-    global steps
-    steps += 1
     for i in range(max_steps): # for i ← 1 to max_steps do
+        global steps
+        steps += 1
         if is_complete(current_state, csp): # if current_state is a solution of csp then
             print(steps)
-            global steps_list
-            steps_list.append(steps)
             return current_state # return current_state
         conflicted = conflicted_variables(current_state, csp)
         # set var ← a randomly chosen variable from the set of conflicted variables CONFLICTED[csp]
@@ -145,11 +143,11 @@ def min_conflicts(csp, max_steps, current_state):
 
 def min_conflicts_solver(csp):
     global steps
-    steps = 0
     trial = 0
-    assignment = min_conflicts(csp, 1000, random_state(csp))
-    expire = False
     start = datetime.datetime.now()
+    # assignment = min_conflicts(csp, 1000, random_state(csp))
+    assignment = False
+    expire = False
     while (not assignment or expire): # and time_elapsed < 30):
         trial += 1
         print("trial", trial)
@@ -160,6 +158,9 @@ def min_conflicts_solver(csp):
             print("around 60 seconds have past")
             expire = True
             return False
+    if assignment:
+        global steps_list
+        steps_list.append(steps)
     return assignment
 
 # -------------------------------------------------------
@@ -212,11 +213,12 @@ if __name__ == '__main__':
 
     for i in range(20):
         print("test", i)
-        # state = CSPGenerator(20, 100, 4, "parameter_set") # N M K
+        steps = 0
+        state = CSPGenerator(20, 100, 4, "parameter_set") # N M K
         # state = CSPGenerator(50, 625, 4, "parameter_set") # N M K
         # state = CSPGenerator(100, 2500, 4, "parameter_set") # N M K
         # state = CSPGenerator(200, 10000, 4, "parameter_set") # N M K
-        state = CSPGenerator(400, 40000, 4, "parameter_set") # N M K
+        # state = CSPGenerator(400, 40000, 4, "parameter_set") # N M K
         start = datetime.datetime.now()
         csp = input_to_csp("parameter_set")
         assignment = []
