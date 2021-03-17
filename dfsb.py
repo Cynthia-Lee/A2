@@ -377,23 +377,28 @@ if __name__ == '__main__':
         # state = CSPGenerator(20, 100, 4, "parameter_set") # N M K
         # state = CSPGenerator(50, 625, 4, "parameter_set") # N M K
         # state = CSPGenerator(100, 2500, 4, "parameter_set") # N M K
-        state = CSPGenerator(200, 10000, 4, "parameter_set") # N M K
-        # state = CSPGenerator(400, 40000, 4, "parameter_set") # N M K
+        # state = CSPGenerator(200, 10000, 4, "parameter_set") # N M K
+        state = CSPGenerator(400, 40000, 4, "parameter_set") # N M K
         start = datetime.datetime.now()
         csp = input_to_csp("parameter_set")
         assignment = []
-        assignment = plain_backtracking_search(csp)
-        # assignment = improved_backtracking_search(csp)
+        # assignment = plain_backtracking_search(csp)
+        assignment = improved_backtracking_search(csp)
         write_output(assignment, "output")
         end = datetime.datetime.now()
-        time_elapsed = (end - start)
+        time_elapsed = (end - start) * 1000.0 # milliseconds
         print(time_elapsed)
         times.append(time_elapsed.total_seconds())
         print("---")
     print(states_list)
     x = states_list
     mean = sum(x) / len(x)
-    print("mean", mean)
+    print("mean states", mean)
     sd = math.sqrt(sum([(val - mean)**2 for val in x])/(len(x) - 1))
-    print("sd", sd)
-    print("times", times)
+    print("sd states", sd)
+    # print("times", times)
+    x = times
+    mean = sum(x) / len(x)
+    print("mean times", mean)
+    sd = math.sqrt(sum([(val - mean)**2 for val in x])/(len(x) - 1))
+    print("sd times", sd)
