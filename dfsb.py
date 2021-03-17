@@ -21,6 +21,7 @@ states = 0
 global states_list
 states_list = []
 
+# given csp (constraint information) and current assignment, return the unassigned variables
 def get_unassigned(csp, assignment):
         unassigned = []
         for var in csp.variables:
@@ -109,9 +110,10 @@ def plain_recursive_backtracking(assignment, csp): # returns solution or failure
     # Most constrained variable, Minimum remaining values (MRV) heuristic 
 # Value ordering (order-domain-values)
     # Least constraining value, (LCV) heuristic
+# Trimming domains with: Forward Checking and AC3
+# Forward checking
 # Constraint propagation (inference)
     # AC3, arc consistency
-    # Forward checking
 
 def count_constraints(csp):
     count = {}
@@ -186,7 +188,7 @@ def forward_checking(csp, var, value, assignment):
                 return False   
     return csp
 
-def copy(arr):
+def copy(arr): # makes a deep copy of the array
     new = []
     for element in arr:
         new.append(element)

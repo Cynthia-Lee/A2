@@ -47,7 +47,8 @@ def input_to_csp(file):
     csp = CSP(n, m, k, constraints)
     return csp
 
-def check_assignment(assignment, csp):
+# check if assignment is a valid
+def check_assignment(assignment, csp): # adjacent nodes cannot have the same color
     for constraint in csp.constraints:
         u = constraint[0]
         v = constraint[1]
@@ -60,7 +61,7 @@ def is_complete(assignment, csp): # assignment is the path taken
         return False    
     return check_assignment(assignment, csp)
 
-def copy(arr):
+def copy(arr): # makes a deep copy of the array
     new = []
     for element in arr:
         new.append(element)
@@ -75,7 +76,8 @@ def random_state(csp):
         assignment[node.key] = random.choice(csp.domain)
     return assignment
 
-def conflicted_variables(assignment, csp):
+# return conflicted variables
+def conflicted_variables(assignment, csp): # adjacent nodes cannot have the same color
     conflicted = []
     for constraint in csp.constraints:
         u = constraint[0]
@@ -87,7 +89,8 @@ def conflicted_variables(assignment, csp):
                 conflicted.append(v)
     return conflicted
 
-def conflicts(var, assignment, csp):
+# returns ordered array of values and # of conflicts for each value
+def conflicts(var, assignment, csp): # counts the number of conflicts for each value if assigned to the variable
     ordered_conflicts = []
     values_remain = {} # key = color, value = total number of conflicts
 
@@ -145,10 +148,9 @@ def min_conflicts_solver(csp):
     global steps
     trial = 0
     start = datetime.datetime.now()
-    # assignment = min_conflicts(csp, 1000, random_state(csp))
     assignment = False
     expire = False
-    while (not assignment or expire): # and time_elapsed < 30):
+    while (not assignment or expire): # and time_elapsed < 60 seconds
         trial += 1
         print("trial", trial)
         assignment = min_conflicts(csp, 1000, random_state(csp))
