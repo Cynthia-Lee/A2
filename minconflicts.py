@@ -186,7 +186,7 @@ def write_output(assignment, file):
 
 if __name__ == '__main__':
     # python minconicts.py <INPUT FILE> <OUTPUT FILE>.
-    '''
+    
     # (sys.argv[0]) # minconicts.py
     input = (sys.argv[1]) # INPUT FILE PATH
     output = (sys.argv[2]) # OUTPUT FILE PATH
@@ -207,18 +207,18 @@ if __name__ == '__main__':
     # print("constraints", csp.constraints)
     # print("result", assignment)
     print("time elapsed", time_elapsed)
-    '''
 
+    '''
     times = []
 
     for i in range(20):
         print("test", i)
         steps = 0
-        state = CSPGenerator(20, 100, 4, "parameter_set") # N M K
+        # state = CSPGenerator(20, 100, 4, "parameter_set") # N M K
         # state = CSPGenerator(50, 625, 4, "parameter_set") # N M K
         # state = CSPGenerator(100, 2500, 4, "parameter_set") # N M K
         # state = CSPGenerator(200, 10000, 4, "parameter_set") # N M K
-        # state = CSPGenerator(400, 40000, 4, "parameter_set") # N M K
+        state = CSPGenerator(400, 40000, 4, "parameter_set") # N M K
         start = datetime.datetime.now()
         csp = input_to_csp("parameter_set")
         assignment = []
@@ -241,3 +241,4 @@ if __name__ == '__main__':
     print("mean times", mean)
     sd = math.sqrt(sum([(val - mean)**2 for val in x])/(len(x) - 1))
     print("sd times", sd)
+    '''

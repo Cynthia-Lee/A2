@@ -338,7 +338,7 @@ if __name__ == '__main__':
     # A sample execution of dfsb.py should be as below:
         # python dfsb.py <INPUT FILE> <OUTPUT FILE> <MODE FLAG>.
     # <MODE FLAG> can be either 0 (plain DFS-B) or 1 (improved DFS-B).
-    '''
+    
     # (sys.argv[0]) # dfsb.py
     input = (sys.argv[1]) # INPUT FILE PATH
     output = (sys.argv[2]) # OUTPUT FILE PATH
@@ -363,7 +363,7 @@ if __name__ == '__main__':
     # print("constraints", csp.constraints)
     # print("result", assignment)
     print("time elapsed", time_elapsed)
-    '''
+    
     # print(plain_backtracking_search(input_to_csp(input)))
     # print("---")
     # print(improved_backtracking_search(input_to_csp(input)))
@@ -372,6 +372,7 @@ if __name__ == '__main__':
     # print("---")
     # print(improved_backtracking_search(input_to_csp("backtrack_hard")))
     
+    '''
     times = []
 
     for i in range(20):
@@ -404,3 +405,4 @@ if __name__ == '__main__':
     print("mean times", mean)
     sd = math.sqrt(sum([(val - mean)**2 for val in x])/(len(x) - 1))
     print("sd times", sd)
+    '''
