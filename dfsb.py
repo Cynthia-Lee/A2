@@ -260,13 +260,11 @@ def improved_recursive_backtracking(assignment, csp, colors):
     if is_complete(assignment, csp): # if assignment is complete, return assignment (like goal test)
         return assignment
     var = improved_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
-    print("d", var.key, var.domain)
     for value in improved_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
         if consistent(var, value, assignment, csp): # if value is consistent with assignment given constraints[csp] then
             assignment[var.key] = value # add {var = value} to assignment
             var.domain = [value] # set domain
 
-            print("og", assignment)
             restore_assignment = {}
             for a in assignment:
                 restore_assignment[a] = assignment[a]
@@ -294,8 +292,6 @@ def improved_recursive_backtracking(assignment, csp, colors):
             # remove {var = value} and inferences from assignment
             assignment.pop(var.key, None) 
             var.domain = copy(colors) # reset domain
-            print("popped", var.key, assignment)
-            print("fail global dom", var.domain, csp.domain)
     return False
 
 # -------------------------------------------------------
