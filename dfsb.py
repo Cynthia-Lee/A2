@@ -13,6 +13,9 @@ from CSP import CSP
 # -------------------------------------------------------
 ### helpful funcitons ###
 
+global states
+states = 0
+
 def get_unassigned(csp, assignment):
         unassigned = []
         for var in csp.variables:
@@ -70,10 +73,15 @@ def plain_order_domain_values(var, assignment, csp):
 def plain_backtracking_search(csp):
     # plain DFS, traverse the node tree depth first order
     # if current node doesn't satisfy constraints, skip node and it's children
+    global states
+    states = 0
     return plain_recursive_backtracking({}, csp)
 
 def plain_recursive_backtracking(assignment, csp): # returns solution or failure
+    global states
+    states += 1
     if is_complete(assignment, csp): # if assignment is complete, return assignment (like goal test)
+        print(states)
         return assignment
     var = plain_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
     for value in plain_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
@@ -254,10 +262,15 @@ def improved_backtracking_search(csp):
     colors = []
     for color in range(csp.k):
         colors.append(color)
+    global states
+    states = 0
     return improved_recursive_backtracking({}, csp, colors)
 
 def improved_recursive_backtracking(assignment, csp, colors):
+    global states
+    states += 1
     if is_complete(assignment, csp): # if assignment is complete, return assignment (like goal test)
+        print(states)
         return assignment
     var = improved_select_unassigned_variable(assignment, csp) # var <- select_unassigned_variable(variables[csp],assignment,csp)
     for value in improved_order_domain_values(var, assignment, csp): # given the variable (var) that we have, explore all possible values that you can assign
@@ -320,6 +333,7 @@ if __name__ == '__main__':
     input = (sys.argv[1]) # INPUT FILE PATH
     output = (sys.argv[2]) # OUTPUT FILE PATH
     mode = (sys.argv[3]) # MODE FLAG
+    
     csp = input_to_csp(input)
     assignment = []
     

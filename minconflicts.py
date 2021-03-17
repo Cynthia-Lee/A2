@@ -13,6 +13,9 @@ import datetime
 # -------------------------------------------------------
 ### helpful funcitons ###
 
+global steps
+steps = 0
+
 def get_unassigned(csp, assignment):
         unassigned = []
         for var in csp.variables:
@@ -104,12 +107,12 @@ def conflicts(var, assignment, csp):
     return ordered_conflicts
 
 def min_conflicts(csp, max_steps, current_state):
-    steps = 0
+    global steps
+    steps += 1
     for i in range(max_steps): # for i ← 1 to max_steps do
         if is_complete(current_state, csp): # if current_state is a solution of csp then
+            print(steps)
             return current_state # return current_state
-        steps += 1
-        print(steps)
         conflicted = conflicted_variables(current_state, csp)
         # set var ← a randomly chosen variable from the set of conflicted variables CONFLICTED[csp]
         var = random.choice(conflicted)            
@@ -135,16 +138,18 @@ def min_conflicts(csp, max_steps, current_state):
 #     return failure
 
 def min_conflicts_solver(csp):
-    num = 0
+    global steps
+    steps = 0
+    trial = 0
     assignment = min_conflicts(csp, 1000, random_state(csp))
     expire = False
     start = datetime.datetime.now()
     while (not assignment or expire): # and time_elapsed < 30):
+        trial += 1
+        print("trial", trial)
         assignment = min_conflicts(csp, 1000, random_state(csp))
         end = datetime.datetime.now()
         time_elapsed = (end - start)
-        num += 1
-        print("trial", num)
         if time_elapsed > datetime.timedelta(seconds=60):
             print("around 30 seconds have past")
             expire = True
