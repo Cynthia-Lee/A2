@@ -6,7 +6,7 @@ Run in the command line:
 
 `python dfsb.py <INPUT FILE PATH> <OUTPUT FILE PATH> <MODE FLAG>`
 
-`<MODE FLAG>` can be either 0 (plain DFS-B) or 1 (improved DFS-B)
+`<MODE FLAG>` can be either `0` (plain DFS-B) or `1` (improved DFS-B)
 
 `python minconflicts.py <INPUT FILE PATH> <OUTPUT FILE PATH>`
 
@@ -15,6 +15,7 @@ Run in the command line:
 2. minconflicts.py - runs the MinConflicts local search algorithm.
 
 Input File Content:
+
 N M K
 
 v<sup>0</sup> u<sup>0</sup> (variables vo and uo should not have the same color)
